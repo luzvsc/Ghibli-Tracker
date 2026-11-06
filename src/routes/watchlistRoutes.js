@@ -22,6 +22,15 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/estatisticas", async (req, res, next) => {
+  try {
+    const estatisticas = await watchlistService.obterEstatisticas();
+    res.status(200).json(estatisticas);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.delete("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
