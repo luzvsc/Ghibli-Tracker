@@ -91,3 +91,54 @@ describe("Rotas da Watchlist - GET e DELETE", () => {
     expect(res.body.codigo).toBe("ITEM_NAO_ENCONTRADO");
   });
 });
+
+describe("Rotas da Watchlist - PATCH (Atualizar Status)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("Deve marcar o filme como assistido e atribuir nota com sucesso (200)", async () => {
+    const mockWatchlist = [
+      {
+        id: "uuid-123",
+        titulo: "Ponyo",
+        assistido: false,
+        nota: null,
+      },
+    ];
+
+    watchlistRepository.lerTodos.mockResolvedValue(mockWatchlist);
+    watchlistRepository.salvarTodos.mockResolvedValue();
+
+    const res = await request(app)
+      .patch("/api/watchlist/uuid-123")
+      .send({ nota: 5 });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.assistido).toBe(true);
+    expect(res.body.nota).toBe(5);
+    expect(res.body.atualizadoEm).toBeDefined();
+  });
+
+  it("Deve retornar 400 se a nota for inválida", async () => {
+    watchlistRepository.lerTodos.mockResolvedValue([{ id: "uuid-123" }]);
+
+    const res = await request(app)
+      .patch("/api/watchlist/uuid-123")
+      .send({ nota: 10 }); // Nota fora do limite (1 a 5)
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.codigo).toBe("NOTA_INVALIDA");
+  });
+
+  it("Deve retornar 404 ao tentar atualizar item inexistente", async () => {
+    watchlistRepository.lerTodos.mockResolvedValue([]);
+
+    const res = await request(app)
+      .patch("/api/watchlist/id-falso")
+      .send({ nota: 4 });
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body.codigo).toBe("ITEM_NAO_ENCONTRADO");
+  });
+});
