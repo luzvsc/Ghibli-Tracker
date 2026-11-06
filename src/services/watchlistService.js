@@ -72,4 +72,44 @@ async function removerFilme(id) {
   await watchlistRepository.salvarTodos(itensSalvos);
 }
 
-module.exports = { adicionarFilme, listarWatchlist, removerFilme };
+async function atualizarStatus(id, nota) {
+  const itensSalvos = await watchlistRepository.lerTodos();
+  const index = itensSalvos.findIndex((item) => item.id === id);
+
+  if (index === -1) {
+    const err = new Error("O item não foi encontrado na watchlist.");
+    err.status = 404;
+    err.codigo = "ITEM_NAO_ENCONTRADO";
+    throw err;
+  }
+
+  // Validação da nota (se for enviada, deve ser entre 1 e 5)
+  if (
+    nota !== undefined &&
+    (typeof nota !== "number" || nota < 1 || nota > 5)
+  ) {
+    const err = new Error("A nota deve ser um número entre 1 e 5.");
+    err.status = 400;
+    err.codigo = "NOTA_INVALIDA";
+    throw err;
+  }
+
+  // Atualiza os dados do item
+  itensSalvos[index].assistido = true;
+  if (nota !== undefined) {
+    itensSalvos[index].nota = nota;
+  }
+  itensSalvos[index].atualizadoEm = new Date().toISOString();
+
+  // Salva a lista atualizada
+  await watchlistRepository.salvarTodos(itensSalvos);
+
+  return itensSalvos[index];
+}
+
+module.exports = {
+  adicionarFilme,
+  listarWatchlist,
+  removerFilme,
+  atualizarStatus,
+};

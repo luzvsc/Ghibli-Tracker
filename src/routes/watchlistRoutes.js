@@ -33,4 +33,16 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
+router.patch("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { nota } = req.body; // A nota vem no corpo da requisição (opcional)
+
+    const itemAtualizado = await watchlistService.atualizarStatus(id, nota);
+    res.status(200).json(itemAtualizado);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
