@@ -107,9 +107,39 @@ async function atualizarStatus(id, nota) {
   return itensSalvos[index];
 }
 
+async function obterEstatisticas() {
+  const itens = await watchlistRepository.lerTodos();
+
+  const totalFilmes = itens.length;
+
+  // Filtra apenas os que já foram assistidos
+  const filmesAssistidos = itens.filter((item) => item.assistido);
+  const totalAssistidos = filmesAssistidos.length;
+
+  // Calcula a nota média apenas dos filmes que receberam nota
+  const filmesComNota = filmesAssistidos.filter(
+    (item) => item.nota !== null && item.nota !== undefined,
+  );
+  let notaMedia = 0;
+
+  if (filmesComNota.length > 0) {
+    const somaNotas = filmesComNota.reduce((soma, item) => soma + item.nota, 0);
+    // Arredonda para 1 casa decimal (ex: 4.5)
+    notaMedia = Number((somaNotas / filmesComNota.length).toFixed(1));
+  }
+
+  return {
+    totalFilmes,
+    totalAssistidos,
+    notaMedia,
+  };
+}
+
+// Atualize a última linha:
 module.exports = {
   adicionarFilme,
   listarWatchlist,
   removerFilme,
   atualizarStatus,
+  obterEstatisticas,
 };

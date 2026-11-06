@@ -142,3 +142,37 @@ describe("Rotas da Watchlist - PATCH (Atualizar Status)", () => {
     expect(res.body.codigo).toBe("ITEM_NAO_ENCONTRADO");
   });
 });
+
+describe("Rotas da Watchlist - GET Estatísticas", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("Deve calcular as estatísticas corretamente (200)", async () => {
+    const mockWatchlist = [
+      { assistido: false, nota: null }, // Não assistido
+      { assistido: true, nota: 4 }, // Assistido com nota
+      { assistido: true, nota: 5 }, // Assistido com nota
+    ];
+
+    watchlistRepository.lerTodos.mockResolvedValue(mockWatchlist);
+
+    const res = await request(app).get("/api/watchlist/estatisticas");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.totalFilmes).toBe(3);
+    expect(res.body.totalAssistidos).toBe(2);
+    expect(res.body.notaMedia).toBe(4.5); // (4+5)/2
+  });
+
+  it("Deve retornar estatísticas zeradas se a watchlist estiver vazia", async () => {
+    watchlistRepository.lerTodos.mockResolvedValue([]);
+
+    const res = await request(app).get("/api/watchlist/estatisticas");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.totalFilmes).toBe(0);
+    expect(res.body.totalAssistidos).toBe(0);
+    expect(res.body.notaMedia).toBe(0);
+  });
+});
