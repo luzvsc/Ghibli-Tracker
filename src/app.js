@@ -1,6 +1,7 @@
 const express = require("express");
 const errorHandler = require("./middlewares/errorHandler");
-const filmesRoutes = require("./routes/filmesRoutes"); // <-- Importamos as rotas
+const filmesRoutes = require("./routes/filmesRoutes");
+const watchlistRoutes = require("./routes/watchlistRoutes");
 
 const app = express();
 
@@ -10,8 +11,8 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// Conectamos a rota na URL /api/filmes
 app.use("/api/filmes", filmesRoutes);
+app.use("/api/watchlist", watchlistRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({
