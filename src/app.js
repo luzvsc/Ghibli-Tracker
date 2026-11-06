@@ -1,17 +1,18 @@
 const express = require("express");
 const errorHandler = require("./middlewares/errorHandler");
+const filmesRoutes = require("./routes/filmesRoutes"); // <-- Importamos as rotas
 
 const app = express();
 
-// Middleware nativo do Express para entender JSON no corpo das requisições
 app.use(express.json());
 
-// Endpoint de Health Check (RF10)
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// Rota 404 para caminhos que não existem
+// Conectamos a rota na URL /api/filmes
+app.use("/api/filmes", filmesRoutes);
+
 app.use((req, res, next) => {
   res.status(404).json({
     codigo: "ROTA_NAO_ENCONTRADA",
@@ -19,7 +20,6 @@ app.use((req, res, next) => {
   });
 });
 
-// Middleware de tratamento de erros (deve ser OBRIGATORIAMENTE o último middleware)
 app.use(errorHandler);
 
 module.exports = app;
