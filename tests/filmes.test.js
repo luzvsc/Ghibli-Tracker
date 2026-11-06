@@ -59,3 +59,34 @@ describe("Rotas de Filmes - Busca", () => {
     expect(res.body.codigo).toBe("API_EXTERNA_INDISPONIVEL");
   });
 });
+
+describe("Rotas de Filmes - Detalhe", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("Deve retornar detalhes do filme por ID", async () => {
+    ghibliClient.buscarFilmePorId.mockResolvedValue({
+      id: "123",
+      titulo: "Ponyo",
+      anoLancamento: "2008",
+    });
+
+    const res = await request(app).get("/api/filmes/123");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.titulo).toBe("Ponyo");
+  });
+
+  it("Deve retornar 404 se o filme não existir", async () => {
+    const erro = new Error("Não encontrado");
+    erro.status = 404;
+    erro.codigo = "FILME_NAO_ENCONTRADO";
+    ghibliClient.buscarFilmePorId.mockRejectedValue(erro);
+
+    const res = await request(app).get("/api/filmes/id-falso");
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body.codigo).toBe("FILME_NAO_ENCONTRADO");
+  });
+});

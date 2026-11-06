@@ -22,4 +22,8 @@ async function buscarFilmes(tituloDaBusca) {
   }));
 }
 
-module.exports = { buscarFilmes };
+async function buscarFilmePorId(id) {
+  return await ghibliClient.buscarFilmePorId(id);
+}
+
+module.exports = { buscarFilmes, buscarFilmePorId };
