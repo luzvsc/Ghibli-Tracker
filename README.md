@@ -1,8 +1,5 @@
 # 🎬 Ghibli Tracker
-
-![Versão](https://img.shields.io/github/v/tag/luzvsc/Ghibli-Tracker?label=vers%C3%A3o&color=blue)
 ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)
-![Build](https://github.com/luzvsc/Ghibli-Tracker/actions/workflows/ci.yml/badge.svg)
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 
 API REST em **Node.js + Express** que consome a **API pública do Studio Ghibli** para buscar filmes e permite salvar esses filmes em uma **watchlist pessoal**, com marcação de "assistido" e avaliação de 1 a 10. A watchlist é persistida localmente em um arquivo JSON.
