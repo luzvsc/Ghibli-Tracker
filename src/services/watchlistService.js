@@ -47,4 +47,29 @@ async function adicionarFilme(filmeId) {
   return novoItem;
 }
 
-module.exports = { adicionarFilme };
+// Listar todos os filmes
+async function listarWatchlist() {
+  return await watchlistRepository.lerTodos();
+}
+
+// Remove um item
+async function removerFilme(id) {
+  const itensSalvos = await watchlistRepository.lerTodos();
+  const index = itensSalvos.findIndex((item) => item.id === id);
+
+  // Se o findIndex retornar -1, significa que o ID não existe na lista
+  if (index === -1) {
+    const err = new Error("O item não foi encontrado na watchlist.");
+    err.status = 404;
+    err.codigo = "ITEM_NAO_ENCONTRADO";
+    throw err;
+  }
+
+  // Remove 1 elemento a partir da posição encontrada
+  itensSalvos.splice(index, 1);
+
+  // Salva a lista atualizada
+  await watchlistRepository.salvarTodos(itensSalvos);
+}
+
+module.exports = { adicionarFilme, listarWatchlist, removerFilme };

@@ -13,4 +13,24 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.get("/", async (req, res, next) => {
+  try {
+    const itens = await watchlistService.listarWatchlist();
+    res.status(200).json(itens);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await watchlistService.removerFilme(id);
+    // Retorna 204 No Content (sem corpo de resposta, apenas indica sucesso)
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

@@ -52,3 +52,42 @@ describe("Rotas da Watchlist - POST", () => {
     expect(res.body.codigo).toBe("VALIDACAO_INVALIDA");
   });
 });
+
+describe("Rotas da Watchlist - GET e DELETE", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("Deve listar a watchlist corretamente (200)", async () => {
+    const mockWatchlist = [{ id: "1", titulo: "Totoro" }];
+    watchlistRepository.lerTodos.mockResolvedValue(mockWatchlist);
+
+    const res = await request(app).get("/api/watchlist");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].titulo).toBe("Totoro");
+  });
+
+  it("Deve remover um item da watchlist com sucesso (204)", async () => {
+    // Simula que a watchlist tem o item
+    watchlistRepository.lerTodos.mockResolvedValue([{ id: "uuid-123" }]);
+    watchlistRepository.salvarTodos.mockResolvedValue();
+
+    const res = await request(app).delete("/api/watchlist/uuid-123");
+
+    expect(res.statusCode).toBe(204);
+    // O código 204 garante que o corpo (body) é vazio
+    expect(res.body).toEqual({});
+  });
+
+  it("Deve retornar 404 ao tentar remover item inexistente", async () => {
+    // Simula que a watchlist está vazia
+    watchlistRepository.lerTodos.mockResolvedValue([]);
+
+    const res = await request(app).delete("/api/watchlist/id-falso");
+
+    expect(res.statusCode).toBe(404);
+    expect(res.body.codigo).toBe("ITEM_NAO_ENCONTRADO");
+  });
+});
