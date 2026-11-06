@@ -1,0 +1,30 @@
+{
+  "name": "ghibli-tracker",
+  "version": "1.0.0",
+  "description": "![Versão](https://img.shields.io/github/v/tag/luzvsc/Ghibli-Tracker?label=vers%C3%A3o&color=blue)\r ![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-green)\r ![Build](https://github.com/luzvsc/Ghibli-Tracker/actions/workflows/ci.yml/badge.svg)\r ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)",
+  "homepage": "https://github.com/luzvsc/Ghibli-Tracker#readme",
+  "bugs": {
+    "url": "https://github.com/luzvsc/Ghibli-Tracker/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luzvsc/Ghibli-Tracker.git"
+  },
+  "license": "ISC",
+  "author": "Luz Vasconcelos",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "supertest": "^7.3.1"
+  }
+}
