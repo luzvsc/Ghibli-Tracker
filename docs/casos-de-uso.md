@@ -88,21 +88,17 @@
 3. O sistema localiza o item pelo `id` e atualiza o campo `assistido`.
 4. O sistema grava o arquivo JSON e retorna `200 OK` com o item atualizado.
 
-### Fluxo Alternativo (Desmarcar como assistido)
-
-- **A1:** Se o Usuário enviar `{ "assistido": false }`, o sistema define `assistido = false` e `nota = null` (RN04).
-
 ### Fluxo Principal (Avaliar)
 
-1. O Usuário envia `PATCH /api/watchlist/{id}/avaliacao` com `{ "nota": 9 }`.
-2. O sistema valida que `nota` é um inteiro entre 1 e 10 (RN03).
+1. O Usuário envia `PATCH /api/watchlist/{id}/avaliacao` com `{ "nota": 5 }`.
+2. O sistema valida que `nota` é um inteiro entre 1 e 5 (RN03).
 3. O sistema verifica que o item está marcado como assistido (RN01).
 4. O sistema atualiza o campo `nota`, grava o arquivo JSON e retorna `200 OK` com o item atualizado.
 
 ### Fluxos de Exceção
 
 - **E1: Assistido inválido.** Se `assistido` não for booleano, o sistema retorna `400` com `VALIDACAO_INVALIDA`.
-- **E2: Nota inválida.** Se `nota` não for inteiro entre 1 e 10, o sistema retorna `400` com `VALIDACAO_INVALIDA`.
+- **E2: Nota inválida.** Se `nota` não for inteiro entre 1 e 5, o sistema retorna `400` com `VALIDACAO_INVALIDA`.
 - **E3: Filme não assistido.** Se o item não estiver marcado como assistido, o sistema retorna `409 Conflict` com o código `FILME_NAO_ASSISTIDO`.
 - **E4: Item inexistente.** Se o `id` não existir, o sistema retorna `404 Not Found` com o código `ITEM_NAO_ENCONTRADO`.
 

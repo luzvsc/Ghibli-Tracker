@@ -48,4 +48,27 @@ describe("Watchlist Repository", () => {
       codigo: "ERRO_ARMAZENAMENTO",
     });
   });
+
+  it("Deve repassar erros desconhecidos na leitura do arquivo", async () => {
+    // Força um erro de permissão (EACCES) que não é ENOENT nem SyntaxError
+    const erroPermissao = new Error("Sem permissão");
+    erroPermissao.code = "EACCES";
+    jest.spyOn(fs, "readFile").mockRejectedValueOnce(erroPermissao);
+
+    await expect(watchlistRepository.lerTodos()).rejects.toThrow(
+      "Sem permissão",
+    );
+  });
+
+  it("Deve lançar ERRO_ARMAZENAMENTO se a gravação do arquivo falhar", async () => {
+    // Força uma falha na escrita atômica
+    jest.spyOn(fs, "writeFile").mockRejectedValueOnce(new Error("Disco cheio"));
+
+    await expect(
+      watchlistRepository.salvarTodos([{ id: "1" }]),
+    ).rejects.toMatchObject({
+      codigo: "ERRO_ARMAZENAMENTO",
+      status: 500,
+    });
+  });
 });

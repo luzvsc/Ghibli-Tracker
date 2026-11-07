@@ -1,0 +1,152 @@
+openapi: 3.0.3
+info:
+  title: Ghibli Tracker API
+  version: 1.1.0
+  description: |
+    API REST em Node.js que consome a API pública do Studio Ghibli e mantém uma watchlist
+    pessoal persistida em arquivo JSON local.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: Luz Vasconcelos
+    url: https://github.com/luzvsc/Ghibli-Tracker
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor Local
+
+tags:
+  - name: Sistema
+  - name: Filmes
+  - name: Watchlist
+
+paths:
+  /api/health:
+    get:
+      tags: [Sistema]
+      summary: Verifica a saúde da aplicação
+      responses:
+        "200":
+          description: Aplicação rodando
+          content:
+            application/json:
+              example: { "status": "ok" }
+
+  /api/filmes:
+    get:
+      tags: [Filmes]
+      summary: Busca filmes na API do Studio Ghibli
+      parameters:
+        - name: titulo
+          in: query
+          description: Filtro opcional por trecho do título
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de filmes
+        "503":
+          description: API externa indisponível
+
+  /api/filmes/{id}:
+    get:
+      tags: [Filmes]
+      summary: Detalhes de um filme específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dados do filme
+        "404":
+          description: Filme não encontrado
+        "503":
+          description: API externa indisponível
+
+  /api/watchlist:
+    get:
+      tags: [Watchlist]
+      summary: Lista todos os itens salvos localmente
+      responses:
+        "200":
+          description: Array de filmes na watchlist
+    post:
+      tags: [Watchlist]
+      summary: Adiciona um filme à watchlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filmeId:
+                  type: string
+              required: [filmeId]
+      responses:
+        "201":
+          description: Filme adicionado
+        "400":
+          description: Validação falhou
+        "409":
+          description: Filme já existe na watchlist
+
+  /api/watchlist/estatisticas:
+    get:
+      tags: [Watchlist]
+      summary: Resumo estatístico da watchlist
+      responses:
+        "200":
+          description: Total, assistidos e nota média
+          content:
+            application/json:
+              example:
+                totalFilmes: 4
+                totalAssistidos: 2
+                notaMedia: 4.5
+
+  /api/watchlist/{id}:
+    patch:
+      tags: [Watchlist]
+      summary: Marca como assistido e permite avaliar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nota:
+                  type: number
+                  minimum: 1
+                  maximum: 5
+      responses:
+        "200":
+          description: Status atualizado
+        "400":
+          description: Nota inválida
+        "404":
+          description: Item não encontrado
+    delete:
+      tags: [Watchlist]
+      summary: Remove da watchlist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removido com sucesso
+        "404":
+          description: Item não encontrado
