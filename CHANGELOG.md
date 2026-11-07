@@ -4,7 +4,7 @@ Todas as mudanças relevantes deste projeto são documentadas aqui.
 
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto adota [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Unreleased]
+## [1.1.0] - 2026-11-07
 
 ### Added
 
@@ -42,5 +42,5 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Documentação de planejamento: charter, requisitos, casos de uso e user stories.
 - 25 testes automatizados com Jest e Supertest.
 
-[Unreleased]: https://github.com/luzvsc/Ghibli-Tracker/compare/v1.0.0...develop
+[1.1.0]: https://github.com/luzvsc/Ghibli-Tracker/compare/v1.0.0...develop
 [1.0.0]: https://github.com/luzvsc/Ghibli-Tracker/releases/tag/v1.0.0
