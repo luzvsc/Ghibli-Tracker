@@ -6,11 +6,29 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "test:coverage": "jest --coverage"
   },
-  "keywords": [],
-  "author": "Luz Vasconcelos",
+  "keywords": [
+    "studio-ghibli",
+    "watchlist",
+    "api-rest",
+    "express",
+    "nodejs"
+  ],
+  "author": "Luz Vasconcelos (https://github.com/luzvsc)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luzvsc/Ghibli-Tracker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luzvsc/Ghibli-Tracker/issues"
+  },
+  "homepage": "https://github.com/luzvsc/Ghibli-Tracker#readme",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "express": "^4.21.1"
   },
@@ -19,6 +37,15 @@
     "supertest": "^7.0.0"
   },
   "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 80,
