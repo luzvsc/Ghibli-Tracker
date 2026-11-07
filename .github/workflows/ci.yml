@@ -46,3 +46,37 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 14
+
+  security:
+    name: Segurança (Gitleaks e npm audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout com histórico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Varredura de segredos (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Auditoria das dependências de produção (falha em severidade alta)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Auditoria completa (informativa, não bloqueia)
+        run: npm audit --audit-level=high
+        continue-on-error: true
