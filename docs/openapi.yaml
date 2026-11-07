@@ -3,18 +3,13 @@ info:
   title: Ghibli Tracker API
   version: 1.1.0
   description: |
-    API REST em Node.js que consome a API pública do Studio Ghibli e mantém uma watchlist
-    pessoal persistida em arquivo JSON local.
+    API REST que consome a API pública do Studio Ghibli e mantém uma watchlist pessoal persistida em arquivo JSON local.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  contact:
-    name: Luz Vasconcelos
-    url: https://github.com/luzvsc/Ghibli-Tracker
 
 servers:
   - url: http://localhost:3000
-    description: Servidor Local
 
 tags:
   - name: Sistema
@@ -25,29 +20,25 @@ paths:
   /api/health:
     get:
       tags: [Sistema]
-      summary: Verifica a saúde da aplicação
+      summary: Verifica se a aplicação está ativa
       responses:
         "200":
-          description: Aplicação rodando
-          content:
-            application/json:
-              example: { "status": "ok" }
+          description: OK
 
   /api/filmes:
     get:
       tags: [Filmes]
-      summary: Busca filmes na API do Studio Ghibli
+      summary: Busca filmes por título (parcial, case-insensitive)
       parameters:
         - name: titulo
           in: query
-          description: Filtro opcional por trecho do título
           schema:
             type: string
       responses:
         "200":
           description: Lista de filmes
         "503":
-          description: API externa indisponível
+          $ref: "#/components/responses/ApiExternaIndisponivel"
 
   /api/filmes/{id}:
     get:
@@ -61,58 +52,62 @@ paths:
             type: string
       responses:
         "200":
-          description: Dados do filme
+          description: Detalhes do filme
         "404":
-          description: Filme não encontrado
+          description: Filme não encontrado na API externa
         "503":
-          description: API externa indisponível
+          $ref: "#/components/responses/ApiExternaIndisponivel"
 
   /api/watchlist:
     get:
       tags: [Watchlist]
-      summary: Lista todos os itens salvos localmente
+      summary: Lista todos os itens da watchlist (leitura local)
       responses:
         "200":
-          description: Array de filmes na watchlist
+          description: Lista de itens
+        "500":
+          $ref: "#/components/responses/ErroInterno"
     post:
       tags: [Watchlist]
-      summary: Adiciona um filme à watchlist
+      summary: Adiciona filme à watchlist (com snapshot e bloqueio de duplicidade)
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [filmeId]
               properties:
                 filmeId:
                   type: string
-              required: [filmeId]
       responses:
         "201":
           description: Filme adicionado
         "400":
-          description: Validação falhou
+          description: Erro de validação
+        "404":
+          description: Filme não encontrado
         "409":
-          description: Filme já existe na watchlist
+          description: Conflito - já na watchlist
+        "500":
+          $ref: "#/components/responses/ErroInterno"
+        "503":
+          $ref: "#/components/responses/ApiExternaIndisponivel"
 
   /api/watchlist/estatisticas:
     get:
       tags: [Watchlist]
-      summary: Resumo estatístico da watchlist
+      summary: Obtém resumo estatístico
       responses:
         "200":
-          description: Total, assistidos e nota média
-          content:
-            application/json:
-              example:
-                totalFilmes: 4
-                totalAssistidos: 2
-                notaMedia: 4.5
+          description: Estatísticas (totalFilmes, totalAssistidos, notaMedia)
+        "500":
+          $ref: "#/components/responses/ErroInterno"
 
   /api/watchlist/{id}:
     patch:
       tags: [Watchlist]
-      summary: Marca como assistido e permite avaliar
+      summary: Marca item como assistido e permite avaliação (1 a 5)
       parameters:
         - name: id
           in: path
@@ -127,18 +122,18 @@ paths:
               properties:
                 nota:
                   type: number
-                  minimum: 1
-                  maximum: 5
       responses:
         "200":
-          description: Status atualizado
+          description: Atualizado
         "400":
           description: Nota inválida
         "404":
           description: Item não encontrado
+        "500":
+          $ref: "#/components/responses/ErroInterno"
     delete:
       tags: [Watchlist]
-      summary: Remove da watchlist
+      summary: Remove item da watchlist
       parameters:
         - name: id
           in: path
@@ -147,6 +142,59 @@ paths:
             type: string
       responses:
         "204":
-          description: Removido com sucesso
+          description: Removido
         "404":
           description: Item não encontrado
+        "500":
+          $ref: "#/components/responses/ErroInterno"
+
+components:
+  schemas:
+    Erro:
+      type: object
+      properties:
+        codigo:
+          type: string
+        mensagem:
+          type: string
+  responses:
+    ApiExternaIndisponivel:
+      description: API do Studio Ghibli indisponível, com timeout de 5 segundos ou respondendo com erro
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Erro"
+          examples:
+            timeout:
+              summary: Timeout ou falha de rede
+              value:
+                codigo: API_EXTERNA_INDISPONIVEL
+                mensagem: A API do Studio Ghibli demorou a responder ou está fora do ar.
+            respostaComErro:
+              summary: API externa respondeu com status de erro
+              value:
+                codigo: API_EXTERNA_INDISPONIVEL
+                mensagem: Falha ao comunicar com a API do Studio Ghibli.
+
+    ErroInterno:
+      description: Erro inesperado ou falha de armazenamento
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Erro"
+          examples:
+            interno:
+              summary: Erro não previsto
+              value:
+                codigo: ERRO_INTERNO_SERVIDOR
+                mensagem: Ocorreu um erro interno no servidor.
+            armazenamentoLeitura:
+              summary: Arquivo de dados corrompido
+              value:
+                codigo: ERRO_ARMAZENAMENTO
+                mensagem: O arquivo de dados da watchlist está corrompido.
+            armazenamentoGravacao:
+              summary: Falha ao gravar o arquivo
+              value:
+                codigo: ERRO_ARMAZENAMENTO
+                mensagem: Falha ao gravar os dados na watchlist.
