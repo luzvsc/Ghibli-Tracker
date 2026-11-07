@@ -1,36 +1,48 @@
-name: CI Pipeline
+name: CI
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   test:
-    name: Run Tests and Coverage
+    name: Testes e cobertura (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [18.x]
-
+        node-version: [18.x, 20.x]
     steps:
-      - name: Checkout Repository
+      - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Configurar Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: npm
 
-      - name: Install Dependencies
+      - name: Instalar dependências
         run: npm ci
 
-      - name: Run Jest with Coverage
-        run: npm test
+      - name: Executar testes com cobertura (falha se linhas < 80%)
+        run: npm run test:coverage
+
+      - name: Publicar relatório de cobertura
+        if: matrix.node-version == '20.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
