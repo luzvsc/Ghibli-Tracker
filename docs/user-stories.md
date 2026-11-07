@@ -146,19 +146,13 @@ As histórias seguem o padrão **"Como [ator], quero [ação], para que [valor d
 - **Quando** eu envio `PATCH /api/watchlist/{id}/assistido` com `{ "assistido": true }`
 - **Então** recebo `200 OK` com `assistido = true`
 
-**Cenário 2: Desmarcar remove a nota**
-
-- **Dado** que existe um item assistido com `nota = 8`
-- **Quando** eu envio `PATCH /api/watchlist/{id}/assistido` com `{ "assistido": false }`
-- **Então** recebo `200 OK` com `assistido = false` e `nota = null`
-
-**Cenário 3: Valor inválido**
+**Cenário 2: Valor inválido**
 
 - **Dado** que existe um item na watchlist
 - **Quando** eu envio `PATCH /api/watchlist/{id}/assistido` com `{ "assistido": "sim" }`
 - **Então** recebo `400 Bad Request` com o código `VALIDACAO_INVALIDA`
 
-**Cenário 4: Item inexistente**
+**Cenário 3: Item inexistente**
 
 - **Dado** que não existe item com o `id` informado
 - **Quando** eu envio `PATCH /api/watchlist/{id}/assistido`
@@ -168,7 +162,7 @@ As histórias seguem o padrão **"Como [ator], quero [ação], para que [valor d
 
 ## US06: Avaliar filme assistido
 
-**Como** Usuário, **quero** dar uma nota de 1 a 10 a um filme que assisti, **para que** eu registre minha opinião sobre ele.
+**Como** Usuário, **quero** dar uma nota de 1 a 5 a um filme que assisti, **para que** eu registre minha opinião sobre ele.
 
 **Relacionada a:** RF06, UC03 | **Issue:** #14
 
@@ -177,13 +171,13 @@ As histórias seguem o padrão **"Como [ator], quero [ação], para que [valor d
 **Cenário 1: Avaliação válida**
 
 - **Dado** que existe um item marcado como assistido
-- **Quando** eu envio `PATCH /api/watchlist/{id}/avaliacao` com `{ "nota": 9 }`
-- **Então** recebo `200 OK` com `nota = 9`
+- **Quando** eu envio `PATCH /api/watchlist/{id}/avaliacao` com `{ "nota": 5 }`
+- **Então** recebo `200 OK` com `nota = 5`
 
 **Cenário 2: Avaliação de filme não assistido é bloqueada**
 
 - **Dado** que existe um item com `assistido = false`
-- **Quando** eu envio `PATCH /api/watchlist/{id}/avaliacao` com `{ "nota": 7 }`
+- **Quando** eu envio `PATCH /api/watchlist/{id}/avaliacao` com `{ "nota": 4 }`
 - **Então** recebo `409 Conflict` com o código `FILME_NAO_ASSISTIDO`
 
 **Cenário 3: Nota fora do intervalo**

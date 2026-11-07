@@ -46,4 +46,24 @@ describe("Cliente da API Ghibli", () => {
       codigo: "API_EXTERNA_INDISPONIVEL",
     });
   });
+
+  it("Deve lançar API_EXTERNA_INDISPONIVEL se a listagem falhar (status não ok)", async () => {
+    global.fetch.mockResolvedValueOnce({ ok: false, status: 500 });
+
+    await expect(ghibliClient.listarFilmes()).rejects.toMatchObject({
+      codigo: "API_EXTERNA_INDISPONIVEL",
+      status: 503,
+    });
+  });
+
+  it("Deve lançar API_EXTERNA_INDISPONIVEL se a busca por ID falhar com status não ok (exceto 404)", async () => {
+    global.fetch.mockResolvedValueOnce({ ok: false, status: 500 });
+
+    await expect(
+      ghibliClient.buscarFilmePorId("id-falso"),
+    ).rejects.toMatchObject({
+      codigo: "API_EXTERNA_INDISPONIVEL",
+      status: 503,
+    });
+  });
 });
